@@ -9,7 +9,7 @@ Your squad shipped the favorites feature in Challenge 02 and wired up quality ga
 
 This is where the Tester agent earns its keep. Instead of hand-writing dozens of test files yourself, you will direct the Tester to generate tests across both stacks -- xUnit for the .NET API, Vitest plus Testing Library for the React frontend. You will also build a custom skill file that teaches the squad your project's testing conventions, so every future test follows the same patterns. Think of it as writing down the rules your team would normally carry around in their heads.
 
-The bar is 80% line coverage on both sides. That is not a suggestion.
+Try to aim for 80% line coverage on both sides. Make it a rule for your agents, and setup enforcement rules like you learned before.
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ The bar is 80% line coverage on both sides. That is not a suggestion.
 
 ## Description
 
-Your test suite is empty or close to it. By the end of this challenge, both the .NET API and the React frontend should have real, meaningful tests that pass your quality gates and hit 80% line coverage.
+Your test suite is empty or close to it. By the end of this challenge, both the .NET API and the React frontend should have real, meaningful tests that pass your quality gates and hits 80% line coverage.
 
 **What you need to accomplish:**
 
@@ -28,7 +28,7 @@ On the API side, you need xUnit tests that cover the full surface of the recipes
 
 On the frontend side, you need component tests using Vitest and Testing Library. The recipe list should render correctly. The favorites toggle should respond to clicks. The favorites page should show the right items. These tests should interact with the component the way a user would -- clicking buttons and reading text -- not reaching into internal state.
 
-Beyond generating tests, create a custom Squad skill that captures your project's testing conventions. This goes in `.squad/skills/testing-conventions/SKILL.md` and should document the patterns your team decided on: how tests are named, how test data is set up, how the API layer gets mocked, and what coverage targets apply. Once this skill exists, any agent on the squad can reference it when writing future tests. The skill starts at `low` confidence -- that is how all earned skills begin.
+Beyond generating tests, create a custom Squad skill that captures your project's testing conventions. This goes in `.squad/skills/testing-conventions/SKILL.md` and should document the patterns your team decided on: how tests are named, how test data is set up, how the API layer gets mocked, and what coverage targets apply. Once this skill exists, any agent on the squad can reference it when writing future tests. The skill starts at `low` confidence -- that is how all earned skills begin. Prompt the Squad agent to create the skill for you with a description of your rules, and instruct it to change as you work. It will grow in confidence as the team uses it more and you accept the outputs.
 
 Every generated test must pass the linting rules you set up in Challenge 03. If the Tester produces tests that fail ESLint or `dotnet format`, those tests need to be fixed before you are done.
 
@@ -51,9 +51,13 @@ Every generated test must pass the linting rules you set up in Challenge 03. If 
 Before you ask the Tester to do anything, measure where you stand. For the .NET API:
 
 ```
-cd src/RecipeHub.Api
-dotnet test --collect:"XPlat Code Coverage"
+dotnet test --collect:"Code Coverage"
 ```
+
+This will generate a coverage report that opens in Visual Studio Enterprise. You can convert this to the standard Cobertura format using the `dotnet-coverage` tool. Run `dotnet tool install --global dotnet-coverage` to install the tool. Then run `dotnet-coverage merge -f cobertura -o cobertura.xml **\*.coverage` to convert your reports. This XML file can be used with the report generator to view in a human frienedly format. To launch and view the report, install the ReportGenerator tool `dotnet tool install -g dotnet-reportgenerator-globaltool`. Then run `reportgenerator -reports:cobertura.xml -reportTypes:Html -targetdir:tests/reports/coverage/`
+
+> [!NOTE]
+> See the .NET Code Coverage tool docs here: https://learn.microsoft.com/en-us/dotnet/core/additional-tools/dotnet-coverage
 
 For the React frontend:
 
@@ -98,11 +102,12 @@ If individual tests fail linting, do not skip the lint step. Have the agent fix 
 
 ## Learning Resources
 
-- Squad skills documentation: https://github.com/bradygaster/squad/blob/dev/docs/src/content/docs/features/skills.md
+- Squad skills documentation: https://bradygaster.github.io/squad/docs/features/skills/
 - Squad skill-discovery sample: https://github.com/bradygaster/squad/blob/dev/samples/skill-discovery/README.md
 - xUnit documentation: https://xunit.net/docs/getting-started/v3/cmdline
 - Vitest coverage guide: https://vitest.dev/guide/coverage
 - Testing Library guiding principles: https://testing-library.com/docs/guiding-principles
+- Helpful Code Coverage in .NET Blog Post: https://www.mytechramblings.com/posts/code-coverage-in-dotnet/
 
 ## Advanced Challenge
 

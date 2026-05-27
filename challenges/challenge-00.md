@@ -53,6 +53,9 @@ Here is what you need to accomplish:
    squad doctor
    ```
 
+   > [!NOTE]
+   > Ignore the error that says the `.squad/` directory is missing. We will solve that shortly.
+
 5. **Verify GitHub Copilot** works in at least one of these interfaces:
    - **CLI:** Run `copilot` to start an interactive session. Type a test prompt and confirm a response.
    - **VS Code:** Open the Copilot Chat panel (Ctrl+Shift+I or Cmd+Shift+I). Send a test message.
@@ -86,10 +89,10 @@ dotnet run --project src/RecipeHub.AppHost
 
 1. The AppHost builds the .NET API project (`src/RecipeHub.Api/`)
 2. The AppHost starts the React frontend (`src/RecipeHub.Web/`) by running `npm run dev` automatically
-3. The Aspire Dashboard launches in your browser (URL printed to terminal, typically `https://localhost:17xxx`)
+3. The Aspire Dashboard launches in your browser (URL printed to terminal, typically `https://localhost:17xxx/login?t=xxxxxxx`)
 4. Both services are registered in the dashboard with health checks, logs, and traces
 
-**Note:** The dashboard port is randomized on each run. Always check the terminal output for the exact URL.
+**Note:** The dashboard port is randomized on each person's machine. Always check the terminal output for the exact URL.
 
 ### Verifying Everything Works
 
@@ -128,6 +131,7 @@ Once the AppHost starts, open the Aspire Dashboard URL shown in your terminal. Y
 - The URL is printed in the terminal when AppHost starts — look for a line like `Aspire Dashboard: https://localhost:17xyz`
 - If you closed the terminal, check `dotnet run` output again
 - The dashboard requires HTTPS; if you see certificate warnings, accept them for localhost
+- Run `dotnet dev-certs https --trust` to trust your developer certificate on your machine
 
 **Web service fails to start:**
 - The AppHost runs `npm run dev` for you automatically
@@ -146,7 +150,7 @@ Press **Ctrl+C** in the terminal where `dotnet run` is active. This stops the Ap
 
 ## Success Criteria
 
-- [ ] `squad doctor` reports all checks passing (green)
+- [ ] `squad doctor` reports all checks passing (Except for the `.squad/` folder)
 - [ ] `gh auth status` shows you are authenticated to GitHub.com
 - [ ] `squad --version` prints the installed version (confirms Squad CLI is working)
 - [ ] The Aspire AppHost starts successfully and the Aspire Dashboard is accessible in your browser

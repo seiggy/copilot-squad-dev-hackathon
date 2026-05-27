@@ -4,11 +4,11 @@
 
 ## Introduction
 
-AI agents write code fast. Without guardrails, that speed becomes a liability - inconsistent formatting, lint violations piling up, files modified in directories nobody asked the agent to touch. You have seen this already if you looked closely at what your Squad produced in the last challenge. Maybe the indentation is off. Maybe there is an unused import. Maybe the agent dropped a temp file somewhere unexpected.
+AI agents write code fast. Without guardrails, that speed can become a liability - inconsistent formatting, lint violations piling up, files modified in directories nobody asked the agent to touch. You may have seen this already depending on what your Squad produced in the last challenge. Maybe the indentation is off. Maybe there is an unused import. Maybe the agent dropped a temp file somewhere unexpected.
 
-This challenge is about building a multi-layered quality enforcement pipeline. Not one gate - three. Git hooks catch problems at commit time. Copilot hooks intercept the agent *before* it writes bad code. And a post-write lint cycle makes sure anything that slips through gets caught and fixed before you move on. By the end of this challenge, every line of agent-generated code will pass through automated checks before it lands in your repository.
+This challenge is about building a multi-layered quality enforcement pipeline. Not one gate - three. Git hooks catch problems at commit time. Copilot hooks intercept the agent *before* it accepts bad code. And a post-write lint cycle makes sure anything that slips through gets caught and fixed before you move on. By the end of this challenge, every line of agent-generated code will pass through automated checks before it lands in your repository.
 
-Think of it like code review, except it happens in milliseconds and never gets tired.
+Think of it like code review, except it happens in milliseconds and constantly.
 
 ## Prerequisites
 
@@ -37,17 +37,20 @@ Create a Copilot hooks configuration file at `.copilot/hooks.json` in the projec
 
 The hook is a shell script. It receives JSON on stdin with `toolName` and `toolArgs` fields, and it outputs JSON with a `permissionDecision` field. A decision of `"deny"` stops the tool call dead.
 
-### Layer 3: Post-Write Lint Cycle
+> [!NOTE]
+> Check out https://awesome-copilot.github.com/hooks/ to find useful hooks shared by the community!
+
+### Layer 3: Agent Stop Lint Cycle
 
 After your agents write code, run the full lint and format suite across both projects. If anything fails, direct the agent to fix the specific violations. Then run the suite again. The cycle should look like this:
 
 1. Agent writes code
-2. Linters run and report violations
+2. `agentStop` fires, runs your linter script. If results are unsatisfactory, return "block" decision with results of your linter in the "reason" field to force another turn.
 3. Agent fixes the violations
 4. Linters run again and pass
-5. Commit succeeds
+5. Agent stops successfully.
 
-Demonstrate this full cycle at least once. Ask your Squad to write a small piece of new code (a helper function, a new component, anything real), then run the quality gates and have the agent fix whatever breaks.
+Have an agent help you build a linting script to run on the `agentStop` event hook. Demonstrate this full cycle at least once. Ask your Squad to write a small piece of new code (a helper function, a new component, anything real), then run the quality gates and have the agent fix whatever breaks.
 
 ### Constraints
 
@@ -63,7 +66,7 @@ Demonstrate this full cycle at least once. Ask your Squad to write a small piece
 - [ ] A Copilot `preToolUse` hook configuration exists at `.copilot/hooks.json` in the project root
 - [ ] The preToolUse hook blocks file writes to paths outside `src/RecipeHub.Api/`, `src/RecipeHub.Web/`, and `.squad/`
 - [ ] At least one blocked operation is demonstrated to a coach (either a rejected commit or a denied tool call)
-- [ ] The full lint-fix cycle is demonstrated: agent writes code, lint fails, agent fixes, lint passes, commit succeeds
+- [ ] The `agentStop` full lint-fix cycle is demonstrated: agent writes code, lint fails, agent fixes, lint passes, commit succeeds
 - [ ] Agent-generated code passes all three quality layers on the final commit
 
 ## Hints
@@ -77,7 +80,7 @@ Start in the project root. Run `npx husky init` to scaffold the `.husky/` direct
 <details>
 <summary>Hint 2: Writing the preToolUse hook script</summary>
 
-Create `.copilot/hooks.json` in your project root. The structure maps hook names to shell commands. Your preToolUse entry should point to a script (for example, `.copilot/pre-tool-check.sh`). That script reads JSON from stdin using `INPUT=$(cat)`, then extracts the tool name and arguments with `jq`. Check if `toolArgs` contains file paths outside your allowed directories. To block, output: `{"permissionDecision":"deny","permissionDecisionReason":"Write blocked: path outside allowed directories"}`. If everything looks fine, output nothing or output `{"permissionDecision":"allow"}`.
+Create `.copilot/hooks.json` in your project root. The structure maps hook names to shell commands. Your preToolUse entry should point to a script (for example, `.copilot/pre-tool-check.sh`). That script reads JSON from stdin using `INPUT=$(cat)`, then extracts the tool name and arguments with `jq`. Check if `toolArgs` contains file paths outside your allowed directories. To block, output: `{"permissionDecision":"deny","permissionDecisionReason":"Write blocked: path outside allowed directories"}`. If everything looks fine, output nothing or output `{"permissionDecision":"allow"}`. Use the agents to help build this too!
 </details>
 
 <details>
@@ -92,8 +95,8 @@ For the preToolUse script, parse the JSON like this: extract the tool name with 
 - [dotnet format command reference](https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-format)
 - [ESLint Getting Started](https://eslint.org/docs/latest/use/getting-started)
 - [Prettier CLI documentation](https://prettier.io/docs/cli)
-- [GitHub Copilot hooks](https://docs.github.com/en/copilot/customizing-copilot/extending-copilot-coding-agent-with-mcp/using-copilot-coding-agent-hooks)
+- [GitHub Copilot hooks](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/use-hooks)
 
 ## Advanced Challenge
 
-Add a **pre-push** hook that goes further than the pre-commit check. Have it run the full test suite (`dotnet test` for the API, `npm test` for the client) and block the push if any test fails. Then configure a `postToolUse` hook that automatically appends a comment header to any new file the agent creates - something like `// Generated by Squad agent - reviewed by quality gate pipeline` with a timestamp. This creates an audit trail showing which files were agent-generated and when they passed quality checks.
+Add a **pre-push** hook that goes further than the pre-commit check. Have it run the full test suite (`dotnet test` for the API, `npm test` for the client) and block the push if any test fails. Then configure a `postToolUse` hook that automatically prepends a comment header to any new file the agent creates - something like `// Generated by Squad agent - reviewed by quality gate pipeline` with a timestamp. This creates an audit trail showing which files were agent-generated and when they passed quality checks.

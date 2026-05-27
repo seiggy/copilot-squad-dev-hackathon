@@ -28,7 +28,7 @@ Ralph is Squad's autonomous operations daemon. When running in watch mode, it po
 
 > **Reminder:** Ralph needs to create labels, assign agents, and open PRs on your repository. This is why you forked the sample app in Challenge 00 instead of cloning it directly. Make sure you are working in your fork and that `gh auth status` shows write access to your forked repo.
 
-Get Ralph running in watch-and-execute mode against your forked repository. Set it to poll every 5 minutes with execution enabled. Then create three distinct GitHub Issues on your fork:
+Get Ralph running in watch-and-execute mode against your forked repository (See: https://bradygaster.github.io/squad/docs/features/ralph/#watch-mode-squad-watch). Set it to poll every 5 minutes with execution enabled. Then create three distinct GitHub Issues on your fork:
 
 1. A **feature request** -- something small and concrete that an agent can actually implement (a new utility function, an API endpoint, a config option)
 2. A **bug report** -- describe a real or plausible defect with reproduction steps
@@ -83,11 +83,11 @@ This is the proof that your squad can operate autonomously under policy, with fu
 <details>
 <summary>Hint 1: Where to start and in what order</summary>
 
-Start the Aspire Dashboard first -- it takes a moment to pull the image and initialize. Run the Docker container with ports 18888 (web UI) and 4317 (OTLP receiver) exposed, both auth modes set to Unsecured. While that starts, set `OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317` in your shell environment.
+Start the Aspire Dashboard first -- it takes a moment to pull the image and initialize. Run the dashboard with ports 18888 (web UI) and 4317 (OTLP receiver) exposed, both auth modes set to Unsecured. While that starts, set `OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317` in your shell environment.
 
 Next, get Ralph going: `squad watch --execute --interval 5`. Then create issues from the GitHub web UI or use `gh issue create --title "..." --body "..."` from the command line. Three issues, three different types.
 
-Save the governance hooks for last -- they are code, and you can iterate on them while Ralph is already polling.
+Save the governance hooks for last -- they are code, and you can iterate on them while Ralph is already polling. Or, even better, create a github issue and let the squad do it!
 </details>
 
 <details>
@@ -112,9 +112,9 @@ Ralph uses a 4-tier error recovery system: circuit breaker reset, auth reprobe, 
 
 ## Learning Resources
 
-- [Squad Ralph documentation](https://github.com/bradygaster/squad/blob/dev/docs/src/content/docs/features/ralph.md)
-- [Squad SDK reference](https://github.com/bradygaster/squad/blob/dev/docs/src/content/docs/reference/sdk.md)
-- [Squad tools and hooks](https://github.com/bradygaster/squad/blob/dev/docs/src/content/docs/reference/tools-and-hooks.md)
+- [Squad Ralph documentation](https://bradygaster.github.io/squad/docs/features/ralph/)
+- [Squad SDK reference](https://bradygaster.github.io/squad/docs/reference/sdk/)
+- [Squad tools and hooks](https://bradygaster.github.io/squad/docs/reference/tools-and-hooks/)
 - [.NET Aspire Dashboard (standalone)](https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/dashboard/standalone)
 - [OpenTelemetry environment variables](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/observability-otlp-example)
 

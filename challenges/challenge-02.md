@@ -9,7 +9,7 @@ You have a squad. Now make it build something.
 
 The recipe-sharing app your team inherited is functional but bare-bones -- users can browse recipes and create new ones via the UI form, but there is no way to mark a recipe as a favorite or come back to a curated list later. Product wants a "favorites" feature, and you are going to delegate the entire thing to your squad rather than writing it yourself.
 
-This is where multi-agent development stops being theoretical. You will hand off a feature request the same way a tech lead hands a spec to a distributed team: state what you want, let the agents decompose the work, and watch Backend and Frontend work in parallel. The Lead agent breaks down the request, Backend builds API endpoints and a new data model in .NET, Frontend adds the React UI, and your job is to observe the coordination, check the output, and verify the whole thing works end-to-end.
+This is where multi-agent development can save you real time. You will hand off a feature request the same way a tech lead hands a spec to a distributed team: state what you want, let the agents decompose the work, and watch Backend and Frontend work in parallel. The Lead agent breaks down the request, Backend builds API endpoints and a new data model in .NET, Frontend adds the React UI, and your job is to observe the coordination, check the output, and verify the whole thing works end-to-end.
 
 Pay attention to what happens in `.squad/decisions.md` and the agent history files. These are not just log artifacts -- they are the shared memory that makes your squad smarter on the next task.
 
@@ -67,7 +67,7 @@ The feature does not need to be production-polished. You are not grading code qu
 
 Start broad. Address the entire squad with a single feature request rather than micromanaging individual agents. Something like:
 
-"Team, we need a favorites feature. Users should be able to mark recipes as favorites and see all their favorites on a dedicated page. The backend needs REST endpoints for adding, removing, and listing favorites. The frontend needs a toggle on recipe cards and a new favorites page."
+"Team, we need a favorites feature. Users should be able to mark recipes as favorites and see all their favorites on a dedicated page. The backend needs REST endpoints for adding, removing, and listing favorites. The frontend needs a toggle on recipe cards and a new favorites page view to view the users's favorite recipes."
 
 The Lead agent should decompose this into tasks and fan out the work. Watch the output -- you should see Backend and Frontend receiving tasks and working at the same time.
 
@@ -119,8 +119,8 @@ If your agents did not automatically record decisions, you can prompt them direc
 
 ## Learning Resources
 
-- Squad parallel execution: https://github.com/bradygaster/squad/blob/dev/docs/src/content/docs/features/parallel-execution.md
-- Squad guide: https://github.com/bradygaster/squad/blob/dev/docs/src/content/docs/guide.md
+- Squad parallel execution: https://bradygaster.github.io/squad/docs/features/parallel-execution/
+- Squad guide: https://bradygaster.github.io/squad/docs/guide/tips-and-tricks/
 - .NET Minimal API tutorial: https://learn.microsoft.com/en-us/aspnet/core/tutorials/min-web-api
 
 ## Advanced Challenge

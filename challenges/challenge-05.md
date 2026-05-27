@@ -9,7 +9,7 @@ You have spent the last four challenges building features, wiring up quality gat
 
 It is not.
 
-Three bugs have been hiding in the starter project, dormant until now. One crashes an API endpoint. Another makes the UI flicker and contradict itself under fast user input. The third quietly accepts data that should never pass validation. These are the kinds of bugs that show up in production at 4pm on a Friday -- the kind where reading stack traces and stepping through code is what separates a quick fix from a four-hour firefight.
+Three bugs have been hiding in the starter project, dormant until now (unless you just happened to stumble upon it!). One crashes an API endpoint. Another makes the UI flicker and contradict itself under fast user input. The third quietly accepts data that should never pass validation. These are the kinds of bugs that show up in production at 4pm on a Friday -- the kind where reading stack traces and stepping through code is what separates a quick fix from a four-hour firefight.
 
 This challenge is different from the ones before it. You will not be told what is wrong. You will be told what users see. Your job is to describe those symptoms to your squad, let the agents trace the root cause, and verify the fixes with tests. The agents have context from every previous challenge -- your history, your architectural decisions, your testing conventions. That accumulated knowledge matters now more than ever.
 
@@ -22,40 +22,28 @@ As a stretch goal, you will set up remote access to your squad and fix at least 
 
 ## Description
 
-### Activate the bugs
+### Bug: Cook Mode failure
 
-The starter project includes a script that introduces three pre-planted bugs into your codebase. Run it to activate the issues:
-
-```
-npm run activate-bugs
-```
-
-After activation, your app compiles and starts -- but certain operations will fail or behave incorrectly. Verify activation succeeded by calling `GET /api/favorites` on a user with no favorites — it should crash with a 500 error and log an exception.
-
-**Important:** Do not read the script source code to find the answers. The bugs are injected as real code changes (not comments or hints), and you must diagnose from observed symptoms. The point is diagnosis, not shortcuts.
-
-### Bug 1 - API 500 Error
-
-**What the user sees:** Calling `GET /api/favorites` returns a 500 Internal Server Error, but only for users who have not saved any favorites yet. Users with at least one favorite see their list just fine. The server logs show an unhandled exception.
+**What the user sees:** Selecting "Cook Mode" on a recipe causes the app to spin for several seconds, and then an error message returns `Couldn't load cook mode. Request failed: 404 Not Found`
 
 **Your task:** Report this symptom to your squad. Do not tell them what the fix is. Describe what you observed and let them investigate the server code, read the logs, and propose a fix. Once the fix is in, have the Tester agent write a regression test that covers the empty-favorites case.
 
-### Bug 2 - UI Race Condition
+### Bug 2 - Poor UI Accessibility
 
-**What the user sees:** Rapidly clicking the favorite toggle on a recipe card causes inconsistent UI state. The heart icon flickers between filled and empty states, and the backend may receive duplicate add/remove requests in rapid succession. It does not happen every time -- sometimes it takes three or four rapid clicks to trigger it.
+**What the user sees:** Several portions of the UI have poor accessibility. Text that is hard to read, blinding white boxes on a black background, grey text on a black background, light grey on a white background.
 
-**Your task:** Have your squad reproduce this issue, diagnose the root cause in the frontend state management (likely missing debouncing or async state guards), and implement a fix. The fix should handle the case where multiple toggle requests overlap. Ask the Tester to write a test that simulates rapid toggling and verifies consistent UI state.
+**Your task:** Describe to the Squad the problems you see in the UI, have them make a refactoring pass at cleaning up the accessibility concerns. Try giving them goals, such as telling them you'd like to meet `WCAG 2.1` readability standards.
 
-### Bug 3 - Validation Bypass
+### Bug 3 - Missing Observability Instrumentation
 
-**What the user sees:** The `POST /api/recipes` endpoint happily accepts recipes with empty names, negative serving counts, or other obviously invalid data. It should reject these with a 400 Bad Request and a clear error message.
+**What the user sees:** Your data engineer has reported that the observability traces aren't useful to him and his team. Help him out by getting the agents to fix the missing OpenTelemetry configuration for SQLite
 
-**Your task:** Direct your squad to add proper input validation on the API side and write tests that cover the edge cases -- empty strings, negative numbers, zero servings, missing required fields, boundary values.
+**Your task:** Direct your squad to help you fix this bug. See if they can find the documentation, and successfully enable OpenTelemetry support for SQLite and Aspire so that your data layer telemetry shows in the Aspire Traces dashboard.
 
 ## Success Criteria
 
 - [ ] All 3 bugs are fixed and the application runs without errors
-- [ ] Each bug fix has at least one regression test that would catch the original issue
+- [ ] Each bug fix that can has at least one regression test that would catch the original issue
 - [ ] All existing tests from Challenge 04 still pass (no regressions introduced)
 - [ ] All quality gates pass -- linting, formatting, and pre-commit hooks report clean
 - [ ] Orchestration logs or `decisions.md` show that agents were used for diagnosis (not just manual debugging)
@@ -64,12 +52,12 @@ After activation, your app compiles and starts -- but certain operations will fa
 
 Set up remote access to your squad so you can interact with agents from a phone or tablet:
 
-1. Authenticate with devtunnel: `devtunnel user login`
-2. Start your squad with tunnel access enabled: `squad start --tunnel`
+1. Launch GitHub Copilot CLI: `copilot --agent squad`
+2. Enable GitHub Copilot Remote Access: `/remote on` and Ctrl+e to show the QR Code
 3. Scan the QR code that appears in the terminal with your phone's camera
 4. From your phone's browser, direct an agent to investigate or fix one of the three bugs
 
-This is not just a party trick. Remote access to your development agents means you can triage production issues from anywhere -- a conference room whiteboard session, a commute, or a couch. For an extra challenge, fix all three bugs entirely from your phone using the remote tunnel -- no laptop keyboard allowed.
+Remote access to your development agents means you can triage production issues from anywhere -- a conference room whiteboard session, a commute, or a couch. For an extra challenge, fix all three bugs entirely from your phone using the remote tunnel -- no laptop keyboard allowed.
 
 ## Hints
 
@@ -78,28 +66,22 @@ This is not just a party trick. Remote access to your development agents means y
 
 The whole point of this challenge is letting agents diagnose the problem from symptoms. For Bug 1, try something like:
 
-"The GET /api/favorites endpoint returns a 500 error when I call it for a user who hasn't saved any favorites yet. Can you check the server logs, trace the exception, and figure out what is going wrong in the favorites controller?"
+"I click on the Cook Mode button on the Recipe Detail view, and it shows a spinner for several seconds and then returns an error: `Couldn't load cook mode. Request failed: 404 Not Found`"
 
-Let the agent read the code, find the null reference, and propose its own fix. If you hand it the answer, you skip the part that matters.
-
-</details>
-
-<details>
-<summary>Hint 2: Reproducing the race condition</summary>
-
-For Bug 2, the intermittent nature makes it tricky. Ask your Tester agent to write a test that fires multiple favorite toggle actions in quick succession without waiting for each one to resolve. Something like: "@Tester, write a test that rapidly toggles a recipe's favorite status 5 times in a row and checks whether the final UI state is consistent."
-
-The fix usually involves adding debouncing to the click handler or using async state guards to prevent overlapping requests.
+Let the agent read the code, find the null reference, and propose its own fix. If you hand it the answer, you skip the part that matters. The goal here is to show that the agents can handle more complex work and can help with debugging issues that you might not immediately know the fix for.
 
 </details>
 
 <details>
-<summary>Hint 3: Validation and working with agent memory</summary>
+<summary>Hint 2: UI Accessibility</summary>
 
-For Bug 3, be specific about what "invalid" means when you talk to the Backend agent: "@Backend, the POST /api/recipes endpoint currently accepts empty names and negative serving counts. Add model validation that rejects these with a 400 response. Servings must be a positive integer and name must be a non-empty string."
+For Bug 2, accessibility problems can sometimes be a personal preference thing. Using standards such as WCAG 2.2, can help you steer the agents in a way that has solid rules to follow. Use tools like `eslint-plugin-jsx-a11y` to help scan for and surface these problems in a more automated fashion.
 
-Then have the Tester write the edge cases: "@Tester, write tests for POST /api/recipes that send invalid payloads -- empty name, negative servings, zero servings, missing name field -- and verify each gets a 400 status code."
+</details>
 
-Remember that your agents have been building up context across all previous challenges. They have read your `history.md`, your `decisions.md`, and the testing skill you created in Challenge 04. If an agent seems confused about your project structure, point it to those files -- they are its memory.
+<details>
+<summary>Hint 3: Validation and working with remote search</summary>
+
+For Bug 3, try directing the agent to search the Aspire documentation, https://aspire.dev/docs/ Tell the agent that you specifically want to see data platform traces for your SQLite db activity in the Aspire dashboard. Often, pointing agents to known documentation repositories, and nudging them in the direction you'd like them to solve a problem, can help reduce strange behaviors.
 
 </details>
